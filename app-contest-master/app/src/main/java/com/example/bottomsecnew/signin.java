@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,17 +41,22 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.nhn.android.naverlogin.OAuthLogin;
 import com.nhn.android.naverlogin.OAuthLoginHandler;
 import com.nhn.android.naverlogin.ui.view.OAuthLoginButton;
-
-
+/*
+* btn1- google login
+* nbtn- naver login
+* btn3- logout
+*
+ */
 
 public class signin extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, MenuItem.OnMenuItemClickListener{
     private static final int RC_SIGN_IN = 10;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mAuth;
-    private EditText editTextemail;
-    private EditText editTextpassword;
+    private TextInputEditText editTextemail;
+    private TextInputEditText editTextpassword;
     private CallbackManager mCallbackManager;
     private FirebaseAuth.AuthStateListener mAuthListener;
+
     //naver
     public static OAuthLogin mOAuthLoginModule;
     OAuthLoginButton mOAuthLoginButton;
@@ -60,7 +66,13 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
 
     //private TokenBroadcastReceiver mTokenReceiver;
 
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,28 +85,34 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
                 .requestEmail()
                 .build();
 
+        //구글 api 클라이언트 생성
         mGoogleApiClient=new GoogleApiClient.Builder(this)
                 .enableAutoManage(this,this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
                 .build();
 
+        //구글 로그인 버튼 생성
+        SignInButton btn1 = (SignInButton) findViewById(R.id.ib_google);
 
-        SignInButton btn1 = (SignInButton) findViewById(R.id.login_button);
-        OAuthLoginButton nbtn=(OAuthLoginButton)findViewById(R.id.bt_naver);
         btn1.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-               // Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogle);
+                // Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogle);
                 //startActivityForResult(signInIntent, RC_SIGN_IN);
                 Intent signInIntent=Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
                 startActivityForResult(signInIntent, RC_SIGN_IN);
             }
         });
-       // editTextemail=(EditText)findViewById(R.id.editText_email);
-        //editTextpassword=(EditText)findViewById(R.id.editText_password);
+        //네이버 로그인 버튼 생성
+        OAuthLoginButton nbtn=(OAuthLoginButton)findViewById(R.id.ib_naver);
+
+
+
+        editTextemail=findViewById(R.id.et_email);
+        editTextpassword=findViewById(R.id.et_pw);
        // Button btn2=(Button)findViewById(R.id.email_login_button);
-        Button btn3=(Button)findViewById(R.id.logout_button);
+        Button btn3=(Button)findViewById(R.id.logout_button);           //hv)로그아웃 버튼?????????????
     //    btn2.setOnClickListener(new View.OnClickListener() {
 
       //      @Override
@@ -109,6 +127,7 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
      //           setCustomToken(token);
            // }
     //    };
+
         btn3.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -136,7 +155,7 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
         //
 
         mCallbackManager = CallbackManager.Factory.create();
-        LoginButton loginButton = findViewById(R.id.facebook_login_button);
+        LoginButton loginButton = findViewById(R.id.ib_facebook);
         loginButton.setReadPermissions("email", "public_profile");
         loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -158,32 +177,18 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
             }
         });
 
+        /*회원가입*/
+        Button btn_join = findViewById(R.id.btn_join);
+        btn_join.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
-    public BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            onMenuItemClick(item);
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    //mTextMessage.setText(R.string.title_home);
-                    return true;
-                case R.id.navigation_dashboard:
-                   // mTextMessage.setText(R.string.title_dashboard);
-                    return true;
-                case R.id.navigation_notifications:
-                   // mTextMessage.setText(R.string.title_notifications);
-                    return true;
-                case R.id.navigation_search:
-                   // mTextMessage.setText("Login");
-                    return true;
-            }
-            return false;
-        }
-    };
 
     private void handleFacebookAccessToken(AccessToken token) {
      //   Log.d(TAG, "handleFacebookAccessToken:" + token);
@@ -217,7 +222,7 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
         mOAuthLoginModule = OAuthLogin.getInstance();
         mOAuthLoginModule.init(this, "clientid", "clientSecret", "clientName");
 
-        mOAuthLoginButton = findViewById(R.id.bt_naver);
+        mOAuthLoginButton = findViewById(R.id.ib_naver);
 
         mOAuthLoginButton.setOAuthLoginHandler(mOAuthLoginHandler);
 //        mOAuthLoginModule.startOauthLoginActivity(this, mOAuthLoginHandler);
@@ -264,31 +269,7 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
                 });
         // [END sign_in_custom]
     }
-    private void createUser(final String email, final String password){
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                        //    Log.d(TAG, "createUserWithEmail:success");
-                           FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                            Toast.makeText(signin.this, "회원가입 성공", Toast.LENGTH_SHORT).show();
-                        }
-                       else {
-                            // If sign in fails, display a message to the user.
-                          // Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            loginuser(email,password);
-                            Toast.makeText(signin.this, "회원가입 실패",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
 
-                        // ...
-                    }
-                });
-    }
 
     private void loginuser(String email, String password){
         mAuth.signInWithEmailAndPassword(email, password)
@@ -317,6 +298,8 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
     private void updateUI(FirebaseUser user) {
     }
 
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
@@ -336,6 +319,8 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
             }
         }
     }
+
+    //구글 로그인 인증
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -367,7 +352,10 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
 
     }
 
-    @Override   //하단바 메뉴에 대한 intent 설정
+
+
+    //하단바 메뉴에 대한 intent 설정
+    @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
         if(menuItem.getItemId() == R.id.navigation_home){   //1번째 하단바 메뉴
             Intent intent = new Intent(this, MainActivity.class);
@@ -389,4 +377,30 @@ public class signin extends AppCompatActivity implements GoogleApiClient.OnConne
 //        }
         return false;
     }
+
+    //하단바 리스너
+    public BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            onMenuItemClick(item);
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    //mTextMessage.setText(R.string.title_home);
+                    return true;
+                case R.id.navigation_dashboard:
+                    // mTextMessage.setText(R.string.title_dashboard);
+                    return true;
+                case R.id.navigation_notifications:
+                    // mTextMessage.setText(R.string.title_notifications);
+                    return true;
+                case R.id.navigation_search:
+                    // mTextMessage.setText("Login");
+                    return true;
+            }
+            return false;
+        }
+    };
+
 }

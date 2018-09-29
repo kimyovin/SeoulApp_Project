@@ -22,8 +22,10 @@
         <activity android:name=".SearchActivity"/>
         <activity android:name=".CategoryActivity"/>
         <activity android:name=".signin"/>
+        <activity android:name=".comment_activity"/>
+        <activity android:name=".SignupActivity"/>
 
-
+        <uses-permission android:name = "android.permission.INTERNET"/> <!--인터넷 허용코드=>파싱을 위해서..!!-->
 
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>

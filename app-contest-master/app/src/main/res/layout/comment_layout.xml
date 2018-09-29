@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    >
+<!--
+    정책의 댓글버튼을 눌렀을 때 나오는 창
+    블러 처리할 예정
+-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_view2"
+        android:layout_above="@+id/et_nickname"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+    <TextView
+        android:id="@+id/haha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="사용할 익명 이름 :"
+        android:layout_above="@+id/et_comment"/>
+    <EditText
+        android:id="@+id/et_nickname"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/haha"
+        android:layout_above="@+id/et_comment"/>
+    <EditText
+        android:id="@+id/et_comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="댓글을 입력하세요."
+        android:layout_toLeftOf="@+id/btn_push"
+        android:layout_alignParentBottom="true"
+         />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_push"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="작성"/>
+
+</RelativeLayout>

@@ -1,5 +1,6 @@
 package com.example.bottomsecnew;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,14 +11,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MenuItem.OnMenuItemClickListener {
-    MenuItem item1, item2, item3, item4;
-    private TextView mTextMessage;
 
    private ViewPager tabViewPager; //tab이 들어갈 view pager
     ActionBar actionBar;    //swipe할 수 있게 해주는 액션바
@@ -76,8 +78,6 @@ public class MainActivity extends AppCompatActivity implements MenuItem.OnMenuIt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         tabViewPager = findViewById(R.id.pager);    //스와이프할 뷰페이지를 정의
         fm = getSupportFragmentManager();  //fragment Manager 객체 정의
         actionBar = getSupportActionBar();  //액션바 객체 정의
@@ -128,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements MenuItem.OnMenuIt
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);  //하단바 리스너 설정
         BottomNavigationViewHelper.disableShiftMode(navigation);    //하단바 viewHelper 설정
+
+
 
     }
     //onCreate 끝
